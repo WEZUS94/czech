@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учу чеську</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  background: #0a0a0f;
+  font-family: Georgia, serif;
+  color: #e2e8f0;
+  padding: 2rem 1rem 4rem;
+}
+
+.wrap { max-width: 680px; margin: 0 auto; }
+
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  font-family: monospace;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: normal;
+  line-height: 1.1;
+  color: #f1f5f9;
+  margin-bottom: 2rem;
+}
+
+h1 em { color: #4ade80; font-style: italic; }
+
+/* Progress */
+.progress-box {
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #1e293b;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  font-size: 0.78rem;
+}
+
+.progress-label { color: #94a3b8; }
+.progress-count { color: #4ade80; }
+
+.progress-track {
+  height: 5px;
+  background: #0f172a;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #60a5fa);
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+.progress-done {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: #4ade80;
+  display: none;
+}
+
+/* Section label */
+.section-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  margin-top: 1.5rem;
+  font-family: monospace;
+}
+
+/* Tools */
+.tools { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0d1117;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 0.45rem 0.8rem;
+  cursor: default;
+}
+
+.tool-icon { font-size: 0.95rem; }
+.tool-name { font-size: 0.75rem; font-weight: bold; }
+.tool-sub  { font-size: 0.62rem; color: #64748b; }
+
+/* Day cards */
+.day-card {
+  margin-bottom: 0.75rem;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0d1117;
+  transition: border-color 0.3s;
+}
+
+.day-card.open { background: #0f172a; }
+
+.day-header {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  user-select: none;
+}
+
+.day-icon {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.day-info { flex: 1; min-width: 0; }
+
+.day-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.day-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: monospace;
+}
+
+.day-focus { font-size: 0.88rem; font-weight: bold; color: #f1f5f9; }
+
+.day-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-shrink: 0;
+}
+
+.day-counter { font-size: 0.72rem; color: #475569; }
+.day-arrow {
+  color: #475569;
+  font-size: 0.85rem;
+  display: inline-block;
+  transition: transform 0.25s;
+}
+
+.day-card.open .day-arrow { transform: rotate(180deg); }
+
+.day-body {
+  display: none;
+  padding: 0 1.25rem 1.25rem;
+}
+
+.day-card.open .day-body { display: block; }
+
+.day-divider {
+  height: 1px;
+  background: #1e293b;
+  margin-bottom: 0.85rem;
+}
+
+/* Tasks */
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.35rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.task:hover { background: rgba(255,255,255,0.03); }
+.task.checked { }
+
+.checkbox {
+  width: 17px; height: 17px;
+  border-radius: 5px;
+  border: 2px solid #334155;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.2s;
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: #0a0a0f;
+}
+
+.task-text {
+  font-size: 0.84rem;
+  flex: 1;
+  line-height: 1.55;
+  color: #cbd5e1;
+  transition: color 0.2s;
+}
+
+.task.checked .task-text {
+  color: #475569;
+  text-decoration: line-through;
+}
+
+.task-tag {
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+  font-family: monospace;
+}
+
+/* Roadmap */
+.road-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  background: #0d1117;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+}
+
+.road-num {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-family: monospace;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.road-months {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: monospace;
+  margin-right: 0.5rem;
+}
+
+.road-title { font-size: 0.92rem; font-weight: bold; color: #f1f5f9; }
+.road-desc  { font-size: 0.78rem; color: #64748b; margin-top: 0.25rem; line-height: 1.55; }
+
+/* Footer */
+.footer {
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: #0f172a;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.footer strong { color: #94a3b8; }
+</style>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Čeština">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Персональний розпис · Рівень A1 → A2</div>
+  <h1>Учу чеську —<br><em>день за днем</em></h1>
+
+  <!-- Progress -->
+  <div class="progress-box">
+    <div class="progress-row">
+      <span class="progress-label">Тижневий прогрес</span>
+      <span class="progress-count" id="prog-text">0 / 0 завдань</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill"></div>
+    </div>
+    <div class="progress-done" id="prog-done">🎉 Тиждень завершено!</div>
+  </div>
+
+  <!-- New Week Button -->
+  <div style="margin-bottom:1rem;text-align:right">
+    <button onclick="newWeek()" style="background:transparent;border:1px solid #334155;border-radius:8px;padding:0.45rem 1rem;color:#64748b;font-size:0.75rem;font-family:monospace;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='#334155';this.style.color='#64748b'">↺ НОВИЙ ТИЖДЕНЬ</button>
+  </div>
+
+  <!-- Tools -->
+  <div class="section-label">Інструменти</div>
+  <div class="tools">
+    <div class="tool">
+      <span class="tool-icon">🎧</span>
+      <div><div class="tool-name" style="color:#f59e0b">Učíme se česky</div><div class="tool-sub">Podkast · Spotify</div></div>
+    </div>
+    <div class="tool">
+      <span class="tool-icon">📱</span>
+      <div><div class="tool-name" style="color:#a78bfa">BNR додаток</div><div class="tool-sub">Структуровані уроки</div></div>
+    </div>
+    <div class="tool">
+      <span class="tool-icon">🃏</span>
+      <div><div class="tool-name" style="color:#60a5fa">Duo Cards</div><div class="tool-sub">Словниковий запас</div></div>
+    </div>
+    <div class="tool">
+      <span class="tool-icon">🌐</span>
+      <div><div class="tool-name" style="color:#f87171">czechonline.org</div><div class="tool-sub">Курс A1/A2 + граматика</div></div>
+    </div>
+    <div class="tool">
+      <span class="tool-icon">📻</span>
+      <div><div class="tool-name" style="color:#34d399">Чеське радіо</div><div class="tool-sub">Фоновий слух</div></div>
+    </div>
+  </div>
+
+  <!-- Weekdays -->
+  <div class="section-label">Будні дні</div>
+  <div id="days-container"></div>
+
+  <!-- Weekend -->
+  <div class="section-label">Вихідні</div>
+  <div id="weekend-container"></div>
+
+  <!-- Roadmap -->
+  <div class="section-label" style="margin-top:2rem">Дорожня карта</div>
+  <div id="roadmap-container"></div>
+
+  <div class="footer">
+    ⚡ <strong>Залізне правило:</strong> Подкаст вранці + Duo Cards вдень — це мінімум який не пропускаєш навіть у найважчі дні. Послідовність важливіша за інтенсивність.
+  </div>
+
+</div>
+
+<script>
+const tagColors = {
+  дорога:   "#f59e0b",
+  слова:    "#60a5fa",
+  урок:     "#a78bfa",
+  курс:     "#f87171",
+  граматика:"#fb923c",
+  фон:      "#475569",
+  читання:  "#34d399",
+  повтор:   "#e879f9",
+  культура: "#22d3ee",
+};
+
+const days = [
+  { id:"mon", day:"Понеділок", color:"#f87171", icon:"🌐", focus:"czechonline.org", tasks:[
+    {id:"mon1",text:"Подкаст A1/A2 — дорога ранком",tag:"дорога"},
+    {id:"mon2",text:"Duo Cards 10–15 карток на роботі",tag:"слова"},
+    {id:"mon3",text:"Podkast або повтор — дорога ввечері",tag:"дорога"},
+    {id:"mon4",text:"Každodenní čeština A1 — урок на czechonline.org · 30–40 хв",tag:"курс"},
+    {id:"mon5",text:"Чеське радіо фоном",tag:"фон"},
+  ]},
+  { id:"tue", day:"Вівторок", color:"#60a5fa", icon:"📱", focus:"BNR додаток", tasks:[
+    {id:"tue1",text:"Подкаст A1/A2 — дорога ранком",tag:"дорога"},
+    {id:"tue2",text:"Duo Cards 10–15 карток на роботі",tag:"слова"},
+    {id:"tue3",text:"Podkast або повтор — дорога ввечері",tag:"дорога"},
+    {id:"tue4",text:"BNR додаток — структурований урок · 30–40 хв",tag:"урок"},
+    {id:"tue5",text:"Чеське радіо фоном",tag:"фон"},
+  ]},
+  { id:"wed", day:"Середа", color:"#a78bfa", icon:"📄", focus:"Транскрипт + граматика", tasks:[
+    {id:"wed1",text:"Подкаст A1/A2 — дорога ранком",tag:"дорога"},
+    {id:"wed2",text:"Duo Cards 10–15 карток на роботі",tag:"слова"},
+    {id:"wed3",text:"Podkast або повтор — дорога ввечері",tag:"дорога"},
+    {id:"wed4",text:"Перечитай транскрипт подкасту · bit.ly/transcript_podcast",tag:"читання"},
+    {id:"wed5",text:"Gramatika PDF — 1 тема (czechonline.org)",tag:"граматика"},
+    {id:"wed6",text:"Нові слова — додай в Duo Cards",tag:"слова"},
+  ]},
+  { id:"thu", day:"Четвер", color:"#60a5fa", icon:"📱", focus:"BNR додаток", tasks:[
+    {id:"thu1",text:"Подкаст A1/A2 — дорога ранком",tag:"дорога"},
+    {id:"thu2",text:"Duo Cards 10–15 карток на роботі",tag:"слова"},
+    {id:"thu3",text:"Podkast або повтор — дорога ввечері",tag:"дорога"},
+    {id:"thu4",text:"BNR додаток — наступний урок · 30–40 хв",tag:"урок"},
+    {id:"thu5",text:"Чеське радіо фоном",tag:"фон"},
+  ]},
+  { id:"fri", day:"П'ятниця", color:"#f87171", icon:"🌐", focus:"czechonline.org + повтор", tasks:[
+    {id:"fri1",text:"Подкаст A1/A2 — дорога ранком",tag:"дорога"},
+    {id:"fri2",text:"Duo Cards 10–15 карток на роботі",tag:"слова"},
+    {id:"fri3",text:"Podkast або повтор — дорога ввечері",tag:"дорога"},
+    {id:"fri4",text:"Každodenní čeština A1 — наступний урок · 30 хв",tag:"курс"},
+    {id:"fri5",text:"Duo Cards — повтор усіх слів тижня",tag:"повтор"},
+  ]},
+  { id:"sat", day:"Субота", color:"#34d399", icon:"🔁", focus:"Повтор тижня", tasks:[
+    {id:"sat1",text:"Duo Cards — всі слова тижня",tag:"повтор"},
+    {id:"sat2",text:"BNR — пропущені уроки якщо є",tag:"урок"},
+    {id:"sat3",text:"czechonline.org — Každodenní čeština, продовж",tag:"курс"},
+    {id:"sat4",text:"Чеське радіо фоном довше",tag:"фон"},
+  ]},
+  { id:"sun", day:"Неділя", color:"#34d399", icon:"😌", focus:"Легко і вільно", tasks:[
+    {id:"sun1",text:"Нова епізода подкасту A1/A2",tag:"дорога"},
+    {id:"sun2",text:"czechonline.org — розділ Česká republika",tag:"культура"},
+    {id:"sun3",text:"Duo Cards — вільний режим",tag:"слова"},
+  ]},
+];
+
+const roadmap = [
+  {months:"Міс. 1–2", title:"База і звичка",    color:"#4ade80", desc:"Подкаст A1/A2 щодня. Стартуєш Každodenní čeština A1. Головне — не пропускати."},
+  {months:"Міс. 3–4", title:"Перший прогрес",   color:"#60a5fa", desc:"Завершуєш A1 курс. Починаєш A2. Подкаст розумієш суттєво краще."},
+  {months:"Міс. 5–6", title:"Рівень A2",         color:"#f87171", desc:"Jazykový tandem. Подкаст B1 епізоди. Готуєшся до іспиту A2."},
+];
+
+// Load saved progress from localStorage
+const saved = localStorage.getItem('czech_checked');
+const checked = saved ? JSON.parse(saved) : {};
+
+function saveProgress() {
+  localStorage.setItem('czech_checked', JSON.stringify(checked));
+}
+const savedOpen = localStorage.getItem('czech_open');
+const openDays = savedOpen ? JSON.parse(savedOpen) : { mon: true };
+
+function saveOpen() {
+  localStorage.setItem('czech_open', JSON.stringify(openDays));
+}
+
+const allTasks = days.flatMap(d => d.tasks);
+
+function newWeek() {
+  if (!confirm("Скинути весь прогрес тижня?")) return;
+  Object.keys(checked).forEach(k => {
+    checked[k] = false;
+    const row = document.getElementById("task-" + k);
+    const cb  = document.getElementById("cb-" + k);
+    if (row) row.classList.remove("checked");
+    if (cb) {
+      cb.style.border = "2px solid #334155";
+      cb.style.background = "transparent";
+      cb.textContent = "";
+    }
+  });
+  localStorage.removeItem('czech_checked');
+  days.forEach(d => updateCounter(d.id, d.tasks.length));
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.values(checked).filter(Boolean).length;
+  const total = allTasks.length;
+  const pct = Math.round(done / total * 100);
+  document.getElementById("prog-text").textContent = `${done} / ${total} завдань`;
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-done").style.display = pct === 100 ? "block" : "none";
+}
+
+function renderDay(d, containerId) {
+  const container = document.getElementById(containerId);
+
+  const card = document.createElement("div");
+  card.className = "day-card" + (openDays[d.id] ? " open" : "");
+  card.id = "card-" + d.id;
+
+  card.innerHTML = `
+    <div class="day-header" onclick="toggleDay('${d.id}')">
+      <div class="day-icon" style="background:${d.color}18">${d.icon}</div>
+      <div class="day-info">
+        <div class="day-name-row">
+          <span class="day-label" style="color:${d.color}">${d.day}</span>
+          <span class="day-focus">${d.focus}</span>
+        </div>
+      </div>
+      <div class="day-meta">
+        <span class="day-counter" id="counter-${d.id}">0/${d.tasks.length}</span>
+        <span class="day-arrow">▾</span>
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="day-divider"></div>
+      <div id="tasks-${d.id}"></div>
+    </div>
+  `;
+
+  container.appendChild(card);
+
+  const tasksEl = document.getElementById("tasks-" + d.id);
+  d.tasks.forEach(t => {
+    const row = document.createElement("div");
+    row.className = "task";
+    row.id = "task-" + t.id;
+    row.onclick = () => toggleTask(t.id, d.id, d.color, d.tasks.length);
+
+    const tc = tagColors[t.tag] || "#60a5fa";
+    row.innerHTML = `
+      <div class="checkbox" id="cb-${t.id}"></div>
+      <span class="task-text">${t.text}</span>
+      <span class="task-tag" style="background:${tc}22;color:${tc}">${t.tag}</span>
+    `;
+    tasksEl.appendChild(row);
+
+    // Restore saved state immediately after element is created
+    if (checked[t.id]) {
+      row.classList.add("checked");
+      const cb = document.getElementById("cb-" + t.id);
+      if (cb) {
+        cb.style.border = "2px solid " + d.color;
+        cb.style.background = d.color;
+        cb.textContent = "✓";
+      }
+    }
+  });
+
+  updateCounter(d.id, d.tasks.length);
+}
+
+function toggleDay(id) {
+  openDays[id] = !openDays[id];
+  const card = document.getElementById("card-" + id);
+  card.classList.toggle("open", openDays[id]);
+  const d = days.find(x => x.id === id);
+  if (d) card.style.borderColor = openDays[id] ? d.color + "55" : "#1e293b";
+  saveOpen();
+}
+
+function toggleTask(tid, did, color, total) {
+  checked[tid] = !checked[tid];
+  const row  = document.getElementById("task-" + tid);
+  const cb   = document.getElementById("cb-" + tid);
+  row.classList.toggle("checked", checked[tid]);
+  if (checked[tid]) {
+    cb.style.border  = `2px solid ${color}`;
+    cb.style.background = color;
+    cb.textContent  = "✓";
+  } else {
+    cb.style.border  = "2px solid #334155";
+    cb.style.background = "transparent";
+    cb.textContent  = "";
+  }
+  updateCounter(did, total);
+  updateProgress();
+  saveProgress();
+}
+
+function updateCounter(did, total) {
+  const d = days.find(x => x.id === did);
+  if (!d) return;
+  const done = d.tasks.filter(t => checked[t.id]).length;
+  const el = document.getElementById("counter-" + did);
+  if (el) {
+    el.textContent = `${done}/${total}`;
+    el.style.color = done === total ? d.color : "#475569";
+  }
+}
+
+// Render weekdays
+["mon","tue","wed","thu","fri"].forEach(id => {
+  const d = days.find(x => x.id === id);
+  renderDay(d, "days-container");
+});
+
+// Render weekend
+["sat","sun"].forEach(id => {
+  const d = days.find(x => x.id === id);
+  renderDay(d, "weekend-container");
+});
+
+// Render roadmap
+const rc = document.getElementById("roadmap-container");
+roadmap.forEach((r, i) => {
+  rc.innerHTML += `
+    <div class="road-item">
+      <div class="road-num" style="background:${r.color}18;color:${r.color}">${String(i+1).padStart(2,"0")}</div>
+      <div>
+        <div>
+          <span class="road-months" style="color:${r.color}">${r.months}</span>
+          <span class="road-title">${r.title}</span>
+        </div>
+        <div class="road-desc">${r.desc}</div>
+      </div>
+    </div>
+  `;
+});
+
+// Restore counters and progress
+days.forEach(d => updateCounter(d.id, d.tasks.length));
+updateProgress();
+</script>
+</body>
+</html>
