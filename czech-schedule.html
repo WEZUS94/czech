@@ -421,7 +421,13 @@ const roadmap = [
   {months:"Міс. 5–6", title:"Рівень A2",         color:"#f87171", desc:"Jazykový tandem. Подкаст B1 епізоди. Готуєшся до іспиту A2."},
 ];
 
-const checked = {};
+// Load saved progress from localStorage
+const saved = localStorage.getItem('czech_checked');
+const checked = saved ? JSON.parse(saved) : {};
+
+function saveProgress() {
+  localStorage.setItem('czech_checked', JSON.stringify(checked));
+}
 const openDays = { mon: true };
 
 const allTasks = days.flatMap(d => d.tasks);
@@ -478,6 +484,17 @@ function renderDay(d, containerId) {
       <span class="task-tag" style="background:${tc}22;color:${tc}">${t.tag}</span>
     `;
     tasksEl.appendChild(row);
+
+    // Restore saved state immediately after element is created
+    if (checked[t.id]) {
+      row.classList.add("checked");
+      const cb = document.getElementById("cb-" + t.id);
+      if (cb) {
+        cb.style.border = "2px solid " + d.color;
+        cb.style.background = d.color;
+        cb.textContent = "✓";
+      }
+    }
   });
 
   updateCounter(d.id, d.tasks.length);
@@ -507,6 +524,7 @@ function toggleTask(tid, did, color, total) {
   }
   updateCounter(did, total);
   updateProgress();
+  saveProgress();
 }
 
 function updateCounter(did, total) {
@@ -549,6 +567,8 @@ roadmap.forEach((r, i) => {
   `;
 });
 
+// Restore counters and progress
+days.forEach(d => updateCounter(d.id, d.tasks.length));
 updateProgress();
 </script>
 </body>
